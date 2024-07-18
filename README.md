@@ -1,25 +1,37 @@
-# Expected-Runs-Predictor
- We're sharing a model for predicting expected runs based on match context. Download the data, upload to Google Drive, open in Google Colab, run the code, input match details, and get expected runs for the current situation.
-For my people here on Facebook, I have made expected runs model for each delivery seeing the context of the match. 
-You can calculate it by yourself now. 
-All you have to do is to download this data file ⬇️
+from google.colab import drive
 
-https://drive.google.com/file/d/1Z4-M9pqZOOGQGJXZCYHEE7KTZyLbsk81/view?usp=drive_link
+# Mount Google Drive
+drive.mount('/content/drive')
 
-Upload it in your google drive. 
+import pandas as pd
 
-Then open google colab from Google or Chrome Browser. 
+# Load the processed DataFrame from the CSV file
+file_path = '/content/drive/My Drive/selected_columns_data.csv'
+df = pd.read_csv(file_path)
 
-In google colab mount the notebook with your google drive. 
+def calculate_XRuns(inns_rr, inns_wkts, inns_balls_rem):
+    try:
+        # Convert inputs to float (if they are not already)
+        inns_rr = float(inns_rr)
+        inns_wkts = float(inns_wkts)
+        inns_balls_rem = float(inns_balls_rem)
 
-After that download the following file ⬇️
+        # Look up XRuns value based on the input values
+        xruns_value = df[(df['inns_rr'] == inns_rr) &
+                         (df['inns_wkts'] == inns_wkts) &
+                         (df['inns_balls_rem'] == inns_balls_rem)]['XRuns'].values[0]
 
+        return xruns_value
 
-https://colab.research.google.com/drive/1HMNhEMxTL4Q-bP2G9wvoXUhUjrag9rQ0?usp=drive_link
+    except IndexError:
+        return "No matching data found."
+    except Exception as e:
+        return str(e)
 
-Copy all codes from second file and paste them into your own colab and run them. It will ask you to mount your google drive with colab notebook - make sure you already have uploaded the data file in drive. 
+# Example usage:
+inns_rr_input = input("Enter inns_rr value: ")
+inns_wkts_input = input("Enter inns_wkts value: ")
+inns_balls_rem_input = input("Enter inns_balls_rem value: ")
 
-It will then ask you about inputs of three things, first thing will be innings Run Rate: put that seeing any match at the moment. 
-Then it will ask you to input Number of Wickets fallen and then in third place it will ask you Number of Legal deliveries left; put that as well, it will then give you the expected runs on that nth delivery seeing the context. 
-
-#cricketanalytics | #datascience | #cricketdata | #RAAR | #expectedruns
+xruns = calculate_XRuns(inns_rr_input, inns_wkts_input, inns_balls_rem_input)
+print(f"XRuns value: {xruns}")
